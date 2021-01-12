@@ -26,11 +26,11 @@ jobs:
       - run:
           name: Configure server
           command: |
-            yes YES | ansible-playbook -i inventory.txt playbook.yml
+            echo "yes" | ansible-playbook -i inventory.txt playbook.yml
 
 workflows:
   # workflow
   my_workflow:
     jobs:
-      - create_infrastructure
-      # - configure_infrastructure
+      # - create_infrastructure
+      - configure_infrastructure
