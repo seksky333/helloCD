@@ -1,68 +1,20 @@
 # Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
-# Use a package of configuration called an orb.
-commands:
-  print_pipeline_id:
-    description: "DESC"
-    parameters:
-      print_value:
-        type: string
-        default: Nothing
-    steps:
-      - run: echo <<parameters.print_value>>
-      
+
 jobs:
-  print_my_name: #job name
+  create_infrastructure: #job name
     docker: # it uses the docker executor
-      - image: circleci/node:13.8.0
+      - image: amazon/aws-cli
     steps:
-      - run: 
+      - checkout
+      - run:
+          name: Ensure background infrastructure exist
           #echo environment variable
           command: |
-            echo $MY_NAME
-
-  save_hello_world_output: 
-    docker: 
-      - image: circleci/node:13.8.0
-    steps:
-      - run: echo "hello world" > ~/output.txt
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - output.txt
-
-  print_output_file: 
-    docker: 
-      - image: circleci/node:13.8.0
-    steps:
-      - attach_workspace:
-          at: ~/
-      - run: cat ~/output.txt
-  cause_error: 
-    docker: 
-      - image: circleci/node:13.8.0
-    steps:
-      - run: return 1
-
-      - run: 
-          name: on error
-          command: echo "Error occurs"
-          when: on_fail
-  execute_command: #job name
-    docker: # it uses the docker executor
-      - image: circleci/node:13.8.0
-    steps:
-      - print_pipeline_id: 
-          print_value: ${CIRCLE_WORKFLOW_ID}
+            aws cloudformation deploy --template-file template.yml --stack-name my-stack
 
 workflows:
   # workflow
-  hw_workflow:
+  my_workflow:
     jobs:
-      # - print_my_name
-      # - save_hello_world_output
-      # - print_output_file:
-      #     requires:
-      #       - save_hello_world_output
-      - execute_command
-      - cause_error
+      - create_infrastructure
