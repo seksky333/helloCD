@@ -28,9 +28,6 @@ jobs:
           name: Configure server
           command: |
             ansible-playbook -i inventory.txt playbook.yml
-      - run:
-          name: Yes to fingerPrint
-          command: |
             yes
 workflows:
   # workflow
