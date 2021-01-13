@@ -3,6 +3,7 @@ version: 2.1
 
 commands:
   destroy_environment:
+    description: "DESC"
     steps:
       - run:
           name: Destroy Environment
@@ -52,8 +53,8 @@ jobs:
             else
               return 1
             fi
-      - destroy_environment:
-          when: on_fail
+      - destroy_environment 
+        when: on_fail
 
 workflows:
   # workflow
