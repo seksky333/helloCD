@@ -18,6 +18,7 @@ jobs:
           command: |
             aws cloudformation delete-stack --stack-name prod-${CIRCLE_WORKFLOW_ID}
           when: on_fail
+      - run: echo ${CIRCLE_WORKFLOW_ID}
 
   configure_infrastructure:
     docker:
