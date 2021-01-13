@@ -1,6 +1,12 @@
 # Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
-
+commands:
+  destroy_environment:
+    steps:
+      - run:
+          name: Destroy Environment
+          command: |
+            aws cloudformation delete-stack --stack-name prod-${CIRCLE_WORKFLOW_ID}
 jobs:
   create_infrastructure: #job name
     docker: # it uses the docker executor
@@ -29,24 +35,24 @@ jobs:
             ansible-playbook -i inventory.txt playbook.yml
   smoke_test:
     docker:
-      - image: alpine:latest
+      - image: amazon/aws-cli
     steps:
-      - run: apk add --update curl
+      - checkout
       - run:
-          name: smoke test.
+          name: simulate error
           command: |
-            URL="https://blog.udacity.com" 
-            if curl -s --head ${URL} # test if blog.udacity.com exists
-            then
-              return 0
-            else
-              return 1
-            fi
+            return 1
+      - destroy_environment
+      when: on_fail
 
 workflows:
   # workflow
   my_workflow:
     jobs:
-      # - create_infrastructure
-      # - configure_infrastructure
-      - smoke_test
+      - create_infrastructure
+      - configure_infrastructure:
+          requires:
+            - create_infrastructure
+      - smoke_test:
+          requires:
+            - configure_infrastructure
