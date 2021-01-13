@@ -12,6 +12,12 @@ jobs:
           #echo environment variable
           command: |
             aws cloudformation deploy --template-file template.yml --stack-name prod-${CIRCLE_WORKFLOW_ID}
+      - run: return 1
+      - run:
+          name: destroy environment
+          command: |
+            aws cloudformation delete-stack --stack-name prod-${CIRCLE_WORKFLOW_ID}
+          when: on_fail
 
   configure_infrastructure:
     docker:
@@ -55,9 +61,9 @@ workflows:
   my_workflow:
     jobs:
       - create_infrastructure
-      - configure_infrastructure:
-          requires:
-            - create_infrastructure
-      - smoke_test:
-          requires:
-            - configure_infrastructure
+      # - configure_infrastructure:
+      #     requires:
+      #       - create_infrastructure
+      # - smoke_test:
+      #     requires:
+      #       - configure_infrastructure
