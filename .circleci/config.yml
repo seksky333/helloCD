@@ -38,12 +38,9 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-      - run:
-          name: simulate error
-          command: |
-            return 1
+      - run: return 1
       - destroy_environment
-          when: on_fail
+        when: on_fail
 workflows:
   # workflow
   my_workflow:
